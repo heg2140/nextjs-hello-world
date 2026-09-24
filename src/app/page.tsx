@@ -7,6 +7,12 @@ export default function Home() {
       <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
         Deployed with Next.js on Vercel.
       </p>
+      <a
+        href="/tasks"
+        className="mt-8 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+      >
+        View Tasks
+      </a>
     </div>
   );
 }
