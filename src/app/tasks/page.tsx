@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase/server";
 
 type Task = {
   id: number;
@@ -11,6 +11,7 @@ type Task = {
 export const dynamic = "force-dynamic";
 
 export default async function TasksPage() {
+  const supabase = await createClient();
   const { data: tasks, error } = await supabase
     .from("tasks")
     .select("id, title, is_complete, created_at")
