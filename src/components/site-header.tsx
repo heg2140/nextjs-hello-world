@@ -18,7 +18,7 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 bg-zinc-50 dark:bg-zinc-950">
+    <header className="sticky top-0 z-10 border-b border-zinc-300 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           href="/"
