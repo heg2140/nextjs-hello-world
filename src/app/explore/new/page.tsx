@@ -82,7 +82,7 @@ export default async function NewSearchPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-black">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-5xl">
         <Link
           href="/explore"
           className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"

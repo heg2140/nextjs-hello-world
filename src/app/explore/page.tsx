@@ -76,7 +76,7 @@ export default async function ExplorePage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-black">
-      <div className="w-full max-w-2xl">
+      <div className="w-full max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
