@@ -27,6 +27,9 @@ export function AddressAutocomplete({
   const [loading, setLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  // Tags each outgoing request so a late-arriving response from an older
+  // keystroke can't overwrite results from a more recent one.
+  const requestIdRef = useRef(0);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -48,27 +51,37 @@ export function AddressAutocomplete({
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     if (text.trim().length < 3) {
+      requestIdRef.current++; // invalidate any in-flight request
       setResults([]);
       setOpen(false);
       return;
     }
 
     debounceRef.current = setTimeout(async () => {
+      const requestId = ++requestIdRef.current;
       setLoading(true);
       try {
         const res = await fetch(
           `/api/geocode?q=${encodeURIComponent(text)}`
         );
         const data = await res.json();
+
+        // A newer request has already started (or finished) — this
+        // response is stale, so drop it instead of showing outdated
+        // results for whatever is currently typed.
+        if (requestId !== requestIdRef.current) return;
+
         setResults(data.results ?? []);
         setOpen(true);
       } finally {
-        setLoading(false);
+        if (requestId === requestIdRef.current) setLoading(false);
       }
     }, 400);
   };
 
   const handleSelect = (result: GeocodeResult) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    requestIdRef.current++; // invalidate any in-flight request
     setQuery(result.displayName);
     onChange(result);
     setOpen(false);
