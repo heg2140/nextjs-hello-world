@@ -27,13 +27,20 @@ const RESPONSE_SCHEMA = {
 
 function buildPrompt(input: {
   startingPoint: string;
+  startingLat: number | null;
+  startingLon: number | null;
   activityType: string;
   timeOfDay: string;
   maxTravelMinutes: number;
 }) {
+  const coordsLine =
+    input.startingLat !== null && input.startingLon !== null
+      ? `\nStarting point coordinates: ${input.startingLat}, ${input.startingLon} (use this for an accurate location, the address text can be ambiguous)`
+      : "";
+
   return `You are a local NYC expert who only recommends completely free activities (the only acceptable cost is public transit fare). The user is a college student exploring New York City.
 
-Starting point: ${input.startingPoint}
+Starting point: ${input.startingPoint}${coordsLine}
 Activity type: ${input.activityType}
 Time of day: ${input.timeOfDay}
 Maximum one-way travel time: ${input.maxTravelMinutes} minutes
@@ -78,6 +85,10 @@ export async function POST(request: Request) {
   const activityType = typeof body?.activityType === "string" ? body.activityType.trim() : "";
   const timeOfDay = typeof body?.timeOfDay === "string" ? body.timeOfDay.trim() : "";
   const maxTravelMinutes = Number(body?.maxTravelMinutes);
+  const startingLat =
+    typeof body?.startingLat === "number" ? body.startingLat : null;
+  const startingLon =
+    typeof body?.startingLon === "number" ? body.startingLon : null;
 
   if (
     !startingPoint ||
@@ -85,16 +96,20 @@ export async function POST(request: Request) {
     !timeOfDay ||
     !Number.isFinite(maxTravelMinutes) ||
     maxTravelMinutes <= 0 ||
-    maxTravelMinutes > 180
+    maxTravelMinutes > 180 ||
+    startingLat === null ||
+    startingLon === null
   ) {
     return NextResponse.json(
-      { error: "Missing or invalid fields." },
+      { error: "Missing or invalid fields. Pick an address from the autocomplete suggestions." },
       { status: 400 }
     );
   }
 
   const prompt = buildPrompt({
     startingPoint,
+    startingLat,
+    startingLon,
     activityType,
     timeOfDay,
     maxTravelMinutes,
@@ -148,6 +163,8 @@ export async function POST(request: Request) {
     .insert({
       user_id: user.id,
       starting_point: startingPoint,
+      start_lat: startingLat,
+      start_lon: startingLon,
       activity_type: activityType,
       time_of_day: timeOfDay,
       max_travel_minutes: maxTravelMinutes,

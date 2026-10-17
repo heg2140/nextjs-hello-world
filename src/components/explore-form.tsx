@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  AddressAutocomplete,
+  type SelectedAddress,
+} from "@/components/address-autocomplete";
 
 const ACTIVITY_TYPES = [
   "Outdoors / nature",
@@ -16,7 +20,9 @@ const TIMES_OF_DAY = ["Morning", "Afternoon", "Evening", "Night"];
 
 export function ExploreForm() {
   const router = useRouter();
-  const [startingPoint, setStartingPoint] = useState("");
+  const [startingPoint, setStartingPoint] = useState<SelectedAddress | null>(
+    null
+  );
   const [activityType, setActivityType] = useState(ACTIVITY_TYPES[0]);
   const [timeOfDay, setTimeOfDay] = useState(TIMES_OF_DAY[0]);
   const [maxTravelMinutes, setMaxTravelMinutes] = useState(30);
@@ -25,8 +31,10 @@ export function ExploreForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!startingPoint.trim()) {
-      setErrorMessage("Enter a starting point.");
+    if (!startingPoint) {
+      setErrorMessage(
+        "Pick a starting point from the suggestions so we know it's a real address."
+      );
       return;
     }
 
@@ -37,7 +45,9 @@ export function ExploreForm() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        startingPoint: startingPoint.trim(),
+        startingPoint: startingPoint.displayName,
+        startingLat: startingPoint.lat,
+        startingLon: startingPoint.lon,
         activityType,
         timeOfDay,
         maxTravelMinutes,
@@ -64,13 +74,7 @@ export function ExploreForm() {
         <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
           Starting point
         </label>
-        <input
-          type="text"
-          value={startingPoint}
-          onChange={(e) => setStartingPoint(e.target.value)}
-          placeholder="e.g. Barnard College, Morningside Heights"
-          className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-black outline-none focus:border-black dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-white"
-        />
+        <AddressAutocomplete value={startingPoint} onChange={setStartingPoint} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -131,7 +135,7 @@ export function ExploreForm() {
 
       <button
         type="submit"
-        disabled={loading}
+        disabled={loading || !startingPoint}
         className="self-start rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
       >
         {loading ? "Finding free things to do..." : "Generate suggestions"}
