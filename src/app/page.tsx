@@ -25,21 +25,9 @@ export default async function Home() {
         >
           Explore
         </Link>
-        <Link
-          href="/tasks"
-          className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
-        >
-          Tasks
-        </Link>
 
         {user ? (
           <>
-            <Link
-              href="/dashboard"
-              className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
-            >
-              Dashboard
-            </Link>
             <Link
               href="/profile"
               className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
