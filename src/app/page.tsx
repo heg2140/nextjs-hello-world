@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -27,15 +26,12 @@ export default async function Home() {
         </Link>
 
         {user ? (
-          <>
-            <Link
-              href="/profile"
-              className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
-            >
-              Profile
-            </Link>
-            <SignOutButton />
-          </>
+          <Link
+            href="/profile"
+            className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
+          >
+            Profile
+          </Link>
         ) : (
           <Link
             href="/login"

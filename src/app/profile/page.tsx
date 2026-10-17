@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/profile-form";
+import { SignOutButton } from "@/components/sign-out-button";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -37,6 +38,10 @@ export default async function ProfilePage() {
           initialLastName={profile?.last_name ?? null}
           initialAvatarUrl={profile?.avatar_url ?? null}
         />
+      </div>
+
+      <div className="mt-8">
+        <SignOutButton />
       </div>
     </div>
   );
