@@ -61,11 +61,11 @@ export function SuggestionFeed({
   }
 
   return (
-    <ul className="mt-4 flex flex-col gap-4">
+    <ul className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {items.map((item) => (
         <li
           key={item.id}
-          className="rounded-xl border border-black/[.08] bg-white p-5 dark:border-white/[.145] dark:bg-zinc-900"
+          className="flex flex-col rounded-xl border border-black/[.08] bg-white p-5 dark:border-white/[.145] dark:bg-zinc-900"
         >
           <div className="flex items-start justify-between gap-4">
             <div>
