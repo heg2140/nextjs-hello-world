@@ -15,12 +15,22 @@ export default async function ExplorePage() {
     redirect("/login");
   }
 
+  const { data: latestGeneration } = await supabase
+    .from("generations")
+    .select("id")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
   const [{ data: suggestions, error: suggestionsError }, { data: votes }] =
     await Promise.all([
       supabase
         .from("suggestions")
-        .select("id, title, description, neighborhood, transit_directions, created_at")
-        .order("created_at", { ascending: false }),
+        .select(
+          "id, generation_id, title, description, neighborhood, transit_directions, created_at"
+        )
+        .order("created_at", { ascending: true }),
       supabase.from("votes").select("suggestion_id, user_id, value"),
     ]);
 
@@ -37,12 +47,22 @@ export default async function ExplorePage() {
     votesBySuggestion.set(vote.suggestion_id, entry);
   }
 
-  const feedItems = (suggestions ?? [])
-    .map((s) => ({
-      ...s,
-      score: votesBySuggestion.get(s.id)?.score ?? 0,
-      myVote: votesBySuggestion.get(s.id)?.myVote ?? 0,
-    }))
+  const allItems = (suggestions ?? []).map((s) => ({
+    ...s,
+    score: votesBySuggestion.get(s.id)?.score ?? 0,
+    myVote: votesBySuggestion.get(s.id)?.myVote ?? 0,
+  }));
+
+  // "Your latest search" = only the batch from the most recent generation
+  // you ran, in the order they were generated.
+  const latestItems = latestGeneration
+    ? allItems.filter((s) => s.generation_id === latestGeneration.id)
+    : [];
+
+  // "Community feed" = everything else (from you and others), ranked by
+  // score, so the latest batch doesn't show up twice on screen.
+  const communityItems = allItems
+    .filter((s) => s.generation_id !== latestGeneration?.id)
     .sort((a, b) => b.score - a.score);
 
   return (
@@ -58,17 +78,31 @@ export default async function ExplorePage() {
 
         <ExploreForm />
 
-        <h2 className="mt-12 text-xl font-semibold text-black dark:text-zinc-50">
-          Community suggestions
-        </h2>
-
         {suggestionsError && (
           <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             Failed to load suggestions: {suggestionsError.message}
           </p>
         )}
 
-        {!suggestionsError && <SuggestionFeed items={feedItems} />}
+        {!suggestionsError && (
+          <>
+            <h2 className="mt-12 text-xl font-semibold text-black dark:text-zinc-50">
+              Your latest search
+            </h2>
+            <SuggestionFeed
+              items={latestItems}
+              emptyMessage="Generate your first set of suggestions above."
+            />
+
+            <h2 className="mt-12 text-xl font-semibold text-black dark:text-zinc-50">
+              Community feed
+            </h2>
+            <SuggestionFeed
+              items={communityItems}
+              emptyMessage="No other suggestions yet — check back after more people search."
+            />
+          </>
+        )}
       </div>
     </div>
   );

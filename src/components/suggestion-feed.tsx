@@ -14,7 +14,13 @@ type FeedItem = {
   myVote: number;
 };
 
-export function SuggestionFeed({ items }: { items: FeedItem[] }) {
+export function SuggestionFeed({
+  items,
+  emptyMessage = "No suggestions yet.",
+}: {
+  items: FeedItem[];
+  emptyMessage?: string;
+}) {
   const router = useRouter();
 
   const handleVote = async (suggestionId: number, value: 1 | -1) => {
@@ -50,9 +56,7 @@ export function SuggestionFeed({ items }: { items: FeedItem[] }) {
 
   if (items.length === 0) {
     return (
-      <p className="mt-4 text-zinc-500 dark:text-zinc-400">
-        No suggestions yet — be the first to generate some above.
-      </p>
+      <p className="mt-4 text-zinc-500 dark:text-zinc-400">{emptyMessage}</p>
     );
   }
 
