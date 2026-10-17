@@ -22,9 +22,9 @@ export async function SiteHeader() {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           href="/"
-          className="text-sm font-medium text-black transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
+          className="text-base font-semibold tracking-tight text-black transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
         >
-          ← Home
+          Free NYC
         </Link>
 
         {user ? (
