@@ -187,6 +187,7 @@ export async function POST(request: Request) {
       suggestions.map((s) => ({
         generation_id: generation.id,
         user_id: user.id,
+        activity_type: activityType,
         title: s.title,
         description: s.description,
         neighborhood: s.neighborhood,

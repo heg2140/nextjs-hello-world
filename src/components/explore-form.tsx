@@ -6,25 +6,15 @@ import {
   AddressAutocomplete,
   type SelectedAddress,
 } from "@/components/address-autocomplete";
-
-const ACTIVITY_TYPES = [
-  "Outdoors / nature",
-  "Art / museums",
-  "Music / performance",
-  "Food / markets",
-  "History / walking tour",
-  "Views / photo spots",
-];
-
-const TIMES_OF_DAY = ["Morning", "Afternoon", "Evening", "Night"];
+import { ACTIVITY_TYPES, TIMES_OF_DAY } from "@/lib/explore-constants";
 
 export function ExploreForm() {
   const router = useRouter();
   const [startingPoint, setStartingPoint] = useState<SelectedAddress | null>(
     null
   );
-  const [activityType, setActivityType] = useState(ACTIVITY_TYPES[0]);
-  const [timeOfDay, setTimeOfDay] = useState(TIMES_OF_DAY[0]);
+  const [activityType, setActivityType] = useState<string>(ACTIVITY_TYPES[0]);
+  const [timeOfDay, setTimeOfDay] = useState<string>(TIMES_OF_DAY[0]);
   const [maxTravelMinutes, setMaxTravelMinutes] = useState(30);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
