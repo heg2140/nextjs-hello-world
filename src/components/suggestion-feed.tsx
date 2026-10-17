@@ -69,7 +69,7 @@ export function SuggestionFeed({
         >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h3 className="font-semibold text-black dark:text-zinc-50">
+              <h3 className="font-semibold text-zinc-900 dark:text-zinc-50">
                 {item.title}
               </h3>
               <p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
@@ -88,7 +88,7 @@ export function SuggestionFeed({
               >
                 ▲
               </button>
-              <span className="text-sm font-semibold text-black dark:text-zinc-50">
+              <span className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">
                 {item.score}
               </span>
               <button

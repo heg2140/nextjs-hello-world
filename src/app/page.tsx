@@ -8,8 +8,8 @@ export default async function Home() {
   } = await supabase.auth.getUser();
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 font-sans dark:bg-black">
-      <h1 className="text-5xl font-semibold tracking-tight text-black dark:text-zinc-50">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-50 px-6 font-sans dark:bg-zinc-950">
+      <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
         Free NYC
       </h1>
       <p className="mt-4 max-w-md text-center text-lg text-zinc-600 dark:text-zinc-400">
@@ -20,7 +20,7 @@ export default async function Home() {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/explore"
-          className="rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+          className="rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
         >
           Explore
         </Link>
@@ -28,7 +28,7 @@ export default async function Home() {
         {!user && (
           <Link
             href="/login"
-            className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
+            className="rounded-full border border-black/[.08] px-5 py-2.5 text-sm font-medium text-zinc-900 transition-colors hover:bg-black/[.04] dark:border-white/[.145] dark:text-zinc-50 dark:hover:bg-white/[.08]"
           >
             Sign in
           </Link>

@@ -75,7 +75,7 @@ export function ExploreForm() {
           <select
             value={activityType}
             onChange={(e) => setActivityType(e.target.value)}
-            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-black outline-none focus:border-black dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-white"
+            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-emerald-500"
           >
             {ACTIVITY_TYPES.map((opt) => (
               <option key={opt} value={opt}>
@@ -92,7 +92,7 @@ export function ExploreForm() {
           <select
             value={timeOfDay}
             onChange={(e) => setTimeOfDay(e.target.value)}
-            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-black outline-none focus:border-black dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-white"
+            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-emerald-500"
           >
             {TIMES_OF_DAY.map((opt) => (
               <option key={opt} value={opt}>
@@ -112,7 +112,7 @@ export function ExploreForm() {
             max={180}
             value={maxTravelMinutes}
             onChange={(e) => setMaxTravelMinutes(Number(e.target.value))}
-            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-black outline-none focus:border-black dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-white"
+            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-emerald-500"
           />
         </div>
       </div>
@@ -126,7 +126,7 @@ export function ExploreForm() {
       <button
         type="submit"
         disabled={loading || !startingPoint}
-        className="self-start rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+        className="self-start rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50 dark:bg-emerald-500 dark:hover:bg-emerald-600"
       >
         {loading ? "Finding free things to do..." : "Generate suggestions"}
       </button>

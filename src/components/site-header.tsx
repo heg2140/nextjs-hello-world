@@ -18,11 +18,11 @@ export async function SiteHeader() {
   }
 
   return (
-    <header className="sticky top-0 z-10 border-b border-black/[.08] bg-zinc-50/80 backdrop-blur dark:border-white/[.145] dark:bg-black/80">
+    <header className="sticky top-0 z-10 border-b border-black/[.06] bg-white/90 shadow-sm backdrop-blur dark:border-white/[.08] dark:bg-zinc-900/90">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <Link
           href="/"
-          className="text-base font-semibold tracking-tight text-black transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
+          className="text-base font-semibold tracking-tight text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
         >
           Free NYC
         </Link>
@@ -44,7 +44,7 @@ export async function SiteHeader() {
         ) : (
           <Link
             href="/login"
-            className="text-sm font-medium text-black transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
+            className="text-sm font-medium text-zinc-900 transition-colors hover:text-zinc-600 dark:text-zinc-50 dark:hover:text-zinc-300"
           >
             Sign in
           </Link>

@@ -96,7 +96,7 @@ export function AddressAutocomplete({
         onChange={(e) => handleQueryChange(e.target.value)}
         onFocus={() => results.length > 0 && setOpen(true)}
         placeholder="Start typing a NYC address or place..."
-        className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-black outline-none focus:border-black dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-white"
+        className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-950 dark:text-zinc-50 dark:focus:border-emerald-500"
       />
 
       {value && (
@@ -123,7 +123,7 @@ export function AddressAutocomplete({
                 <button
                   type="button"
                   onClick={() => handleSelect(result)}
-                  className="block w-full px-3 py-2 text-left text-sm text-black hover:bg-zinc-100 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  className="block w-full px-3 py-2 text-left text-sm text-zinc-900 hover:bg-zinc-100 dark:text-zinc-50 dark:hover:bg-zinc-800"
                 >
                   {result.displayName}
                 </button>

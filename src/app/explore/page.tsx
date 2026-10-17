@@ -75,11 +75,11 @@ export default async function ExplorePage() {
     .filter((section) => section.items.length > 0);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-black">
+    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-zinc-950">
       <div className="w-full max-w-5xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
               Free NYC
             </h1>
             <p className="mt-2 text-zinc-600 dark:text-zinc-400">
@@ -88,7 +88,7 @@ export default async function ExplorePage() {
           </div>
           <Link
             href="/explore/new"
-            className="shrink-0 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-black dark:hover:bg-zinc-200"
+            className="shrink-0 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
           >
             Find something to do
           </Link>
@@ -113,7 +113,7 @@ export default async function ExplorePage() {
         {!suggestionsError &&
           sections.map((section) => (
             <div key={section.category} className="mt-12">
-              <h2 className="text-xl font-semibold text-black dark:text-zinc-50">
+              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
                 {section.category}
               </h2>
               <SuggestionFeed items={section.items} />

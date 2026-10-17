@@ -20,9 +20,9 @@ export default async function ProfilePage() {
     .single();
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-black">
+    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-zinc-950">
       <div className="w-full max-w-md">
-        <h1 className="text-3xl font-semibold tracking-tight text-black dark:text-zinc-50">
+        <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
           Profile
         </h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">
