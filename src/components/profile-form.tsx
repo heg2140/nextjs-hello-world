@@ -141,7 +141,7 @@ export function ProfileForm({
             type="text"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-emerald-500"
+            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-800 dark:border-white/[.145] dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-200"
           />
         </div>
         <div>
@@ -152,7 +152,7 @@ export function ProfileForm({
             type="text"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-emerald-600 dark:border-white/[.145] dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-emerald-500"
+            className="w-full rounded-lg border border-black/[.08] bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-800 dark:border-white/[.145] dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-200"
           />
         </div>
 
@@ -170,7 +170,7 @@ export function ProfileForm({
         <button
           type="submit"
           disabled={saving}
-          className="mt-2 rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 disabled:opacity-50 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+          className="mt-2 rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-100"
         >
           {saving ? "Saving..." : "Save profile"}
         </button>

@@ -20,7 +20,7 @@ export default async function Home() {
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
         <Link
           href="/explore"
-          className="rounded-full bg-emerald-600 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-emerald-700 dark:bg-emerald-500 dark:hover:bg-emerald-600"
+          className="rounded-full bg-zinc-800 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-100"
         >
           Explore
         </Link>
