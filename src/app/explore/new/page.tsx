@@ -101,7 +101,7 @@ export default async function NewSearchPage() {
         <ExploreForm />
 
         <h2 className="mt-12 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-          Your latest search
+          Results ({latestItems.length})
         </h2>
         <SuggestionFeed
           items={latestItems}
