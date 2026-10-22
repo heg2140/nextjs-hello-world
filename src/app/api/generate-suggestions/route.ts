@@ -8,8 +8,49 @@ type SuggestionShape = {
   transit_directions: string;
 };
 
-const GEMINI_MODEL = "gemini-flash-latest";
+// Tried in order; if one is overloaded, slow, or retired, the next one is used.
+const GEMINI_MODELS = ["gemini-3.6-flash", "gemini-flash-lite-latest", "gemini-flash-latest"];
 const SUGGESTION_COUNT = 4;
+const GEMINI_TIMEOUT_MS = 20_000;
+// Overloaded (503), rate limited (429), server error (500), or model no longer available (404).
+const FALLBACK_STATUSES = new Set([404, 429, 500, 503]);
+
+class GeminiBusyError extends Error {}
+
+async function callGemini(apiKey: string, requestBody: string) {
+  for (const [index, model] of GEMINI_MODELS.entries()) {
+    if (index > 0) await new Promise((resolve) => setTimeout(resolve, 500));
+
+    let response: Response;
+    try {
+      response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+          signal: AbortSignal.timeout(GEMINI_TIMEOUT_MS),
+        }
+      );
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "TimeoutError") {
+        console.warn(`Gemini model ${model} timed out after ${GEMINI_TIMEOUT_MS}ms`);
+        continue;
+      }
+      throw err;
+    }
+
+    if (response.ok) return response.json();
+
+    const errText = await response.text();
+    if (FALLBACK_STATUSES.has(response.status)) {
+      console.warn(`Gemini model ${model} failed (${response.status}): ${errText}`);
+      continue;
+    }
+    throw new Error(`Gemini API error from ${model} (${response.status}): ${errText}`);
+  }
+  throw new GeminiBusyError("Every Gemini model was busy or unavailable.");
+}
 
 const RESPONSE_SCHEMA = {
   type: "ARRAY",
@@ -117,27 +158,16 @@ export async function POST(request: Request) {
 
   let suggestions: SuggestionShape[];
   try {
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: RESPONSE_SCHEMA,
-          },
-        }),
-      }
+    const geminiData = await callGemini(
+      apiKey,
+      JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: RESPONSE_SCHEMA,
+        },
+      })
     );
-
-    if (!geminiResponse.ok) {
-      const errText = await geminiResponse.text();
-      throw new Error(`Gemini API error (${geminiResponse.status}): ${errText}`);
-    }
-
-    const geminiData = await geminiResponse.json();
     const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (typeof text !== "string") {
       throw new Error("Gemini response was missing generated text.");
@@ -150,6 +180,12 @@ export async function POST(request: Request) {
     suggestions = parsed;
   } catch (err) {
     console.error("Gemini generation failed:", err);
+    if (err instanceof GeminiBusyError) {
+      return NextResponse.json(
+        { error: "The AI service is busy right now. Please try again in a minute." },
+        { status: 503 }
+      );
+    }
     return NextResponse.json(
       { error: "Failed to generate suggestions. Please try again." },
       { status: 502 }
