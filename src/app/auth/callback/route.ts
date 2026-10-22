@@ -14,9 +14,7 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      // Send the user to their profile so we can prompt for a name if
-      // this is their first sign-in.
-      return NextResponse.redirect(`${origin}/profile`);
+      return NextResponse.redirect(`${origin}/`);
     }
   }
 
