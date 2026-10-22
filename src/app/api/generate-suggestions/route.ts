@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { NEIGHBORHOODS } from "@/lib/explore-constants";
 
 type SuggestionShape = {
   title: string;
@@ -59,7 +60,7 @@ const RESPONSE_SCHEMA = {
     properties: {
       title: { type: "STRING" },
       description: { type: "STRING" },
-      neighborhood: { type: "STRING" },
+      neighborhood: { type: "STRING", enum: [...NEIGHBORHOODS] },
       transit_directions: { type: "STRING" },
     },
     required: ["title", "description", "neighborhood", "transit_directions"],
