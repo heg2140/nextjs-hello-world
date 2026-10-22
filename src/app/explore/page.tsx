@@ -2,45 +2,19 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SuggestionFeed } from "@/components/suggestion-feed";
-import { ACTIVITY_TYPES, NEIGHBORHOODS } from "@/lib/explore-constants";
+import { NeighborhoodFilter } from "@/components/neighborhood-filter";
+import { ACTIVITY_TYPES } from "@/lib/explore-constants";
 
 export const dynamic = "force-dynamic";
 
 const TOP_N_PER_CATEGORY = 3;
-
-type GroupBy = "activity" | "neighborhood";
-
-// Older suggestions were saved before the AI had to pick from NEIGHBORHOODS,
-// so match those case-insensitively and fall back to the trimmed text.
-function normalizeNeighborhood(raw: string | null) {
-  const text = (raw ?? "").trim().replace(/\s+/g, " ");
-  if (!text) return "Other";
-  const match = NEIGHBORHOODS.find((n) => n.toLowerCase() === text.toLowerCase());
-  return match ?? text;
-}
-
-function sortGroups(keys: string[], canonical: readonly string[]) {
-  return [
-    ...canonical.filter((k) => keys.includes(k)),
-    ...keys.filter((k) => !canonical.includes(k)).sort(),
-  ];
-}
-
-function exploreHref(groupBy: GroupBy, neighborhood: string | null) {
-  const params = new URLSearchParams();
-  if (groupBy === "neighborhood") params.set("group", "neighborhood");
-  if (neighborhood) params.set("neighborhood", neighborhood);
-  const query = params.toString();
-  return query ? `/explore?${query}` : "/explore";
-}
 
 export default async function ExplorePage({
   searchParams,
 }: {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
-  const { group, neighborhood: neighborhoodParam } = await searchParams;
-  const groupBy: GroupBy = group === "neighborhood" ? "neighborhood" : "activity";
+  const { neighborhood: neighborhoodParam } = await searchParams;
   const selectedNeighborhood =
     typeof neighborhoodParam === "string" ? neighborhoodParam : null;
 
@@ -79,7 +53,7 @@ export default async function ExplorePage({
 
   const allItems = (suggestions ?? []).map((s) => ({
     ...s,
-    neighborhood: normalizeNeighborhood(s.neighborhood),
+    neighborhood: (s.neighborhood ?? "").trim() || "Other",
     score: votesBySuggestion.get(s.id)?.score ?? 0,
     myVote: votesBySuggestion.get(s.id)?.myVote ?? 0,
   }));
@@ -91,29 +65,31 @@ export default async function ExplorePage({
       (neighborhoodCounts.get(item.neighborhood) ?? 0) + 1
     );
   }
-  const neighborhoodOptions = [...neighborhoodCounts.keys()].sort();
+  const neighborhoodOptions = [...neighborhoodCounts.entries()]
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
+  // No neighborhood selected means show everything.
   const visibleItems = selectedNeighborhood
     ? allItems.filter((item) => item.neighborhood === selectedNeighborhood)
     : allItems;
 
   const byCategory = new Map<string, typeof allItems>();
   for (const item of visibleItems) {
-    const category =
-      groupBy === "neighborhood"
-        ? item.neighborhood
-        : (item.activity_type ?? "Other");
+    const category = item.activity_type ?? "Other";
     const list = byCategory.get(category) ?? [];
     list.push(item);
     byCategory.set(category, list);
   }
 
-  // Render in a stable, predictable order: the canonical activity types or
-  // neighborhoods first, then anything else (e.g. older rows).
-  const categoryOrder = sortGroups(
-    [...byCategory.keys()],
-    groupBy === "neighborhood" ? NEIGHBORHOODS : ACTIVITY_TYPES
-  );
+  // Render in a stable, predictable order: the canonical activity types
+  // first, then anything else (e.g. older rows without a category).
+  const categoryOrder = [
+    ...ACTIVITY_TYPES,
+    ...[...byCategory.keys()].filter(
+      (c) => !(ACTIVITY_TYPES as readonly string[]).includes(c)
+    ),
+  ];
 
   const sections = categoryOrder
     .map((category) => ({
@@ -124,11 +100,6 @@ export default async function ExplorePage({
     }))
     .filter((section) => section.items.length > 0);
 
-  const pillClass = (active: boolean) =>
-    active
-      ? "rounded-full bg-zinc-800 px-3 py-1.5 text-sm font-medium text-white dark:bg-zinc-200 dark:text-zinc-900"
-      : "rounded-full border border-black/[.08] bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-white/[.145] dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800";
-
   return (
     <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-zinc-950">
       <div className="w-full max-w-5xl">
@@ -138,7 +109,7 @@ export default async function ExplorePage({
               Free NYC
             </h1>
             <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-              The community&apos;s top-voted free things to do.
+              The community&apos;s top-voted free things to do, by category.
             </p>
           </div>
           <Link
@@ -150,44 +121,14 @@ export default async function ExplorePage({
         </div>
 
         {!suggestionsError && allItems.length > 0 && (
-          <div className="mt-8 flex flex-col gap-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                Group by
-              </span>
-              <Link
-                href={exploreHref("activity", selectedNeighborhood)}
-                className={pillClass(groupBy === "activity")}
-              >
-                Activity type
-              </Link>
-              <Link
-                href={exploreHref("neighborhood", selectedNeighborhood)}
-                className={pillClass(groupBy === "neighborhood")}
-              >
-                Neighborhood
-              </Link>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                Neighborhood
-              </span>
-              <Link
-                href={exploreHref(groupBy, null)}
-                className={pillClass(selectedNeighborhood === null)}
-              >
-                All
-              </Link>
-              {neighborhoodOptions.map((n) => (
-                <Link
-                  key={n}
-                  href={exploreHref(groupBy, n)}
-                  className={pillClass(selectedNeighborhood === n)}
-                >
-                  {n} ({neighborhoodCounts.get(n)})
-                </Link>
-              ))}
-            </div>
+          <div className="mt-8">
+            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+              Neighborhood
+            </label>
+            <NeighborhoodFilter
+              options={neighborhoodOptions}
+              selected={selectedNeighborhood}
+            />
           </div>
         )}
 
@@ -200,7 +141,7 @@ export default async function ExplorePage({
         {!suggestionsError && allItems.length > 0 && sections.length === 0 && (
           <p className="mt-12 text-zinc-500 dark:text-zinc-400">
             No suggestions in this neighborhood yet.{" "}
-            <Link href={exploreHref(groupBy, null)} className="underline">
+            <Link href="/explore" className="underline">
               Show all neighborhoods
             </Link>
             .
