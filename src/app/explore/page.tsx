@@ -2,22 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SuggestionFeed } from "@/components/suggestion-feed";
-import { NeighborhoodFilter } from "@/components/neighborhood-filter";
 import { ACTIVITY_TYPES } from "@/lib/explore-constants";
 
 export const dynamic = "force-dynamic";
 
 const TOP_N_PER_CATEGORY = 3;
 
-export default async function ExplorePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const { neighborhood: neighborhoodParam } = await searchParams;
-  const selectedNeighborhood =
-    typeof neighborhoodParam === "string" ? neighborhoodParam : null;
-
+export default async function ExplorePage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -53,29 +44,12 @@ export default async function ExplorePage({
 
   const allItems = (suggestions ?? []).map((s) => ({
     ...s,
-    neighborhood: (s.neighborhood ?? "").trim() || "Other",
     score: votesBySuggestion.get(s.id)?.score ?? 0,
     myVote: votesBySuggestion.get(s.id)?.myVote ?? 0,
   }));
 
-  const neighborhoodCounts = new Map<string, number>();
-  for (const item of allItems) {
-    neighborhoodCounts.set(
-      item.neighborhood,
-      (neighborhoodCounts.get(item.neighborhood) ?? 0) + 1
-    );
-  }
-  const neighborhoodOptions = [...neighborhoodCounts.entries()]
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => a.name.localeCompare(b.name));
-
-  // No neighborhood selected means show everything.
-  const visibleItems = selectedNeighborhood
-    ? allItems.filter((item) => item.neighborhood === selectedNeighborhood)
-    : allItems;
-
   const byCategory = new Map<string, typeof allItems>();
-  for (const item of visibleItems) {
+  for (const item of allItems) {
     const category = item.activity_type ?? "Other";
     const list = byCategory.get(category) ?? [];
     list.push(item);
@@ -120,35 +94,13 @@ export default async function ExplorePage({
           </Link>
         </div>
 
-        {!suggestionsError && allItems.length > 0 && (
-          <div className="mt-8">
-            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Neighborhood
-            </label>
-            <NeighborhoodFilter
-              options={neighborhoodOptions}
-              selected={selectedNeighborhood}
-            />
-          </div>
-        )}
-
         {suggestionsError && (
           <p className="mt-8 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             Failed to load suggestions: {suggestionsError.message}
           </p>
         )}
 
-        {!suggestionsError && allItems.length > 0 && sections.length === 0 && (
-          <p className="mt-12 text-zinc-500 dark:text-zinc-400">
-            No suggestions in this neighborhood yet.{" "}
-            <Link href="/explore" className="underline">
-              Show all neighborhoods
-            </Link>
-            .
-          </p>
-        )}
-
-        {!suggestionsError && allItems.length === 0 && (
+        {!suggestionsError && sections.length === 0 && (
           <p className="mt-12 text-zinc-500 dark:text-zinc-400">
             Nothing here yet —{" "}
             <Link href="/explore/new" className="underline">

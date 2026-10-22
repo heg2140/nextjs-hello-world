@@ -77,3 +77,8 @@ export const NEIGHBORHOODS = [
   "Elsewhere in the Bronx",
   "Elsewhere in Staten Island",
 ] as const;
+
+// The "Elsewhere in ..." catch-alls aren't useful as something to search for.
+export const SEARCHABLE_NEIGHBORHOODS = NEIGHBORHOODS.filter(
+  (n) => !n.startsWith("Elsewhere")
+);

@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
 
 const ALL_LABEL = "All neighborhoods";
 
 export function NeighborhoodFilter({
   options,
-  selected,
+  value,
+  onChange,
 }: {
-  options: Array<{ name: string; count: number }>;
-  selected: string | null;
+  options: readonly string[];
+  value: string | null;
+  onChange: (value: string | null) => void;
 }) {
-  const router = useRouter();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,22 +32,20 @@ export function NeighborhoodFilter({
   }, []);
 
   const matches = options.filter((o) =>
-    o.name.toLowerCase().includes(query.trim().toLowerCase())
+    o.toLowerCase().includes(query.trim().toLowerCase())
   );
 
   const handleSelect = (name: string | null) => {
     setOpen(false);
     setQuery("");
-    router.push(
-      name ? `/explore?neighborhood=${encodeURIComponent(name)}` : "/explore"
-    );
+    onChange(name);
   };
 
   return (
-    <div ref={containerRef} className="relative w-full sm:w-72">
+    <div ref={containerRef} className="relative">
       <input
         type="text"
-        value={open ? query : (selected ?? ALL_LABEL)}
+        value={open ? query : (value ?? ALL_LABEL)}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setOpen(true)}
         onKeyDown={(e) => {
@@ -56,10 +54,13 @@ export function NeighborhoodFilter({
             setQuery("");
             e.currentTarget.blur();
           }
-          if (e.key === "Enter" && matches.length > 0) {
+          if (e.key === "Enter") {
+            // Don't submit the form while picking a neighborhood.
             e.preventDefault();
-            handleSelect(matches[0].name);
-            e.currentTarget.blur();
+            if (matches.length > 0) {
+              handleSelect(matches[0]);
+              e.currentTarget.blur();
+            }
           }
         }}
         placeholder="Search neighborhoods..."
@@ -80,16 +81,13 @@ export function NeighborhoodFilter({
             </li>
           )}
           {matches.map((o) => (
-            <li key={o.name}>
+            <li key={o}>
               <button
                 type="button"
-                onClick={() => handleSelect(o.name)}
+                onClick={() => handleSelect(o)}
                 className="block w-full px-3 py-2 text-left text-sm text-zinc-900 hover:bg-zinc-100 dark:text-zinc-50 dark:hover:bg-zinc-800"
               >
-                {o.name}{" "}
-                <span className="text-zinc-500 dark:text-zinc-400">
-                  ({o.count})
-                </span>
+                {o}
               </button>
             </li>
           ))}

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { NEIGHBORHOODS } from "@/lib/explore-constants";
+import { NEIGHBORHOODS, SEARCHABLE_NEIGHBORHOODS } from "@/lib/explore-constants";
 
 type SuggestionShape = {
   title: string;
@@ -74,6 +74,7 @@ function buildPrompt(input: {
   activityType: string;
   timeOfDay: string;
   maxTravelMinutes: number;
+  neighborhood: string | null;
 }) {
   const coordsLine =
     input.startingLat !== null && input.startingLon !== null
@@ -85,7 +86,11 @@ function buildPrompt(input: {
 Starting point: ${input.startingPoint}${coordsLine}
 Activity type: ${input.activityType}
 Time of day: ${input.timeOfDay}
-Maximum one-way travel time: ${input.maxTravelMinutes} minutes
+Maximum one-way travel time: ${input.maxTravelMinutes} minutes${
+    input.neighborhood
+      ? `\nNeighborhood: every suggestion must be located in ${input.neighborhood}`
+      : ""
+  }
 
 Suggest exactly ${SUGGESTION_COUNT} distinct, real, specific free things to do in NYC that fit these constraints. For each, include a short best-guess public transit route from the starting point, and explicitly note in that field that it's an AI estimate the user should double check before heading out.`;
 }
@@ -127,6 +132,9 @@ export async function POST(request: Request) {
   const activityType = typeof body?.activityType === "string" ? body.activityType.trim() : "";
   const timeOfDay = typeof body?.timeOfDay === "string" ? body.timeOfDay.trim() : "";
   const maxTravelMinutes = Number(body?.maxTravelMinutes);
+  // Absent or null means any neighborhood; anything else must be a known one.
+  const neighborhood =
+    typeof body?.neighborhood === "string" ? body.neighborhood : null;
   const startingLat =
     typeof body?.startingLat === "number" ? body.startingLat : null;
   const startingLon =
@@ -140,7 +148,9 @@ export async function POST(request: Request) {
     maxTravelMinutes <= 0 ||
     maxTravelMinutes > 180 ||
     startingLat === null ||
-    startingLon === null
+    startingLon === null ||
+    (neighborhood !== null &&
+      !(SEARCHABLE_NEIGHBORHOODS as readonly string[]).includes(neighborhood))
   ) {
     return NextResponse.json(
       { error: "Missing or invalid fields. Pick an address from the autocomplete suggestions." },
@@ -155,6 +165,7 @@ export async function POST(request: Request) {
     activityType,
     timeOfDay,
     maxTravelMinutes,
+    neighborhood,
   });
 
   let suggestions: SuggestionShape[];

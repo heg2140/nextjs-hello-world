@@ -6,7 +6,12 @@ import {
   AddressAutocomplete,
   type SelectedAddress,
 } from "@/components/address-autocomplete";
-import { ACTIVITY_TYPES, TIMES_OF_DAY } from "@/lib/explore-constants";
+import { NeighborhoodFilter } from "@/components/neighborhood-filter";
+import {
+  ACTIVITY_TYPES,
+  SEARCHABLE_NEIGHBORHOODS,
+  TIMES_OF_DAY,
+} from "@/lib/explore-constants";
 
 export function ExploreForm() {
   const router = useRouter();
@@ -16,6 +21,8 @@ export function ExploreForm() {
   const [activityType, setActivityType] = useState<string>(ACTIVITY_TYPES[0]);
   const [timeOfDay, setTimeOfDay] = useState<string>(TIMES_OF_DAY[0]);
   const [maxTravelMinutes, setMaxTravelMinutes] = useState(30);
+  // null means any neighborhood.
+  const [neighborhood, setNeighborhood] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -41,6 +48,7 @@ export function ExploreForm() {
         activityType,
         timeOfDay,
         maxTravelMinutes,
+        neighborhood,
       }),
     });
 
@@ -68,7 +76,18 @@ export function ExploreForm() {
         <AddressAutocomplete value={startingPoint} onChange={setStartingPoint} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            Neighborhood
+          </label>
+          <NeighborhoodFilter
+            options={SEARCHABLE_NEIGHBORHOODS}
+            value={neighborhood}
+            onChange={setNeighborhood}
+          />
+        </div>
+
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
             Activity type
