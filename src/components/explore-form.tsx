@@ -52,7 +52,8 @@ export function ExploreForm() {
       return;
     }
 
-    router.refresh();
+    // Results are tied to this URL, so opening the page fresh starts with no results.
+    router.replace(`/explore/new?generation=${data.generationId}`);
   };
 
   return (

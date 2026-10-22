@@ -6,7 +6,11 @@ import { SuggestionFeed } from "@/components/suggestion-feed";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewSearchPage() {
+export default async function NewSearchPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -16,13 +20,20 @@ export default async function NewSearchPage() {
     redirect("/login");
   }
 
-  const { data: latestGeneration } = await supabase
-    .from("generations")
-    .select("id")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Only show the search the user just ran (its id is put in the URL by the
+  // form), so coming back to this page later starts with no results.
+  const { generation: generationParam } = await searchParams;
+  const generationId =
+    typeof generationParam === "string" ? generationParam : null;
+
+  const { data: latestGeneration } = generationId
+    ? await supabase
+        .from("generations")
+        .select("id")
+        .eq("id", generationId)
+        .eq("user_id", user.id)
+        .maybeSingle()
+    : { data: null };
 
   let latestItems: Array<{
     id: number;
@@ -105,7 +116,7 @@ export default async function NewSearchPage() {
         </h2>
         <SuggestionFeed
           items={latestItems}
-          emptyMessage="Generate your first set of suggestions above."
+          emptyMessage="Generate suggestions above to see results here."
         />
       </div>
     </div>

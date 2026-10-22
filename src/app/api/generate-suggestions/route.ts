@@ -240,5 +240,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ suggestions: savedSuggestions });
+  return NextResponse.json({ generationId: generation.id, suggestions: savedSuggestions });
 }
