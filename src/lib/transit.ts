@@ -58,6 +58,41 @@ export function withoutAlternatives(directions: string) {
     .trim();
 }
 
+// The AI often puts the route and the disclaimer in one sentence:
+// "AI estimate (double check): Take the 1 train..., then walk..." or
+// "Take the 1 to 66 St and walk east; this is an AI estimate, so double check."
+// Pull out only the disclaimer pieces so the route isn't thrown away with them.
+function splitDisclaimer(sentence: string): { route: string; notes: string[] } {
+  // A plain label like "Estimated route:" or "Directions:" isn't a step.
+  let text = sentence.trim().replace(/^(?:estimated |suggested |transit )?(?:route|directions)\s*:\s*/i, "");
+  if (!NOTE_PATTERN.test(text)) return { route: text, notes: [] };
+
+  const notes: string[] = [];
+  // Parentheticals: "(AI estimate - please double check)".
+  text = text.replace(/\s*\(([^)]*)\)/g, (match, inner: string) => {
+    if (NOTE_PATTERN.test(inner)) {
+      notes.push(inner.trim());
+      return "";
+    }
+    return match;
+  });
+  // A leading label: "AI estimate:", "Estimated route (double check):".
+  text = text.replace(/^([^:]{0,60}):\s*/, (match, label: string) => {
+    if (NOTE_PATTERN.test(label)) notes.push(label.trim());
+    if (NOTE_PATTERN.test(label) || /\b(estimated|route|directions)\b/i.test(label)) return "";
+    return match;
+  });
+
+  const routeClauses: string[] = [];
+  for (const clause of text.split(/\s*;\s*|\s+[–—-]\s+|,\s*(?=(?:this|which|but|note|please)\b)/i)) {
+    const trimmed = clause.trim();
+    if (!trimmed) continue;
+    if (NOTE_PATTERN.test(trimmed)) notes.push(trimmed);
+    else routeClauses.push(trimmed);
+  }
+  return { route: routeClauses.join(", "), notes };
+}
+
 export function parseTransit(directions: string): { steps: TransitStep[]; note: string | null } {
   const text = withoutAlternatives(directions);
   if (!text) return { steps: [], note: null };
@@ -75,20 +110,9 @@ export function parseTransit(directions: string): { steps: TransitStep[]; note: 
   const noteParts: string[] = [];
   const routeParts: string[] = [];
   for (const sentence of sentences) {
-    const bare = sentence.replace(/^\(|\)$/g, "");
-    if (NOTE_PATTERN.test(bare)) {
-      // A sentence can start with the route and end with the disclaimer,
-      // e.g. "Walk 5 minutes (AI estimate, double check)".
-      const inline = bare.match(/^(.*?)[\s,;–—-]*\((.*)\)\.?$/);
-      if (inline && !NOTE_PATTERN.test(inline[1]) && NOTE_PATTERN.test(inline[2])) {
-        routeParts.push(inline[1]);
-        noteParts.push(inline[2]);
-      } else {
-        noteParts.push(bare);
-      }
-    } else {
-      routeParts.push(sentence);
-    }
+    const { route, notes } = splitDisclaimer(sentence);
+    noteParts.push(...notes);
+    if (route) routeParts.push(route);
   }
 
   const steps = routeParts
