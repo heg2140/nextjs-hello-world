@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SuggestionFeed } from "@/components/suggestion-feed";
 import { PageHeader } from "@/components/page-header";
-import { ACTIVITY_TYPES, activityIcon } from "@/lib/explore-constants";
+import {
+  ACTIVITY_TYPES,
+  NEAR_COLUMBIA_LABEL,
+  activityIcon,
+  isNearColumbia,
+} from "@/lib/explore-constants";
 
 export const dynamic = "force-dynamic";
 
@@ -66,14 +71,21 @@ export default async function ExplorePage() {
     ),
   ];
 
-  const sections = categoryOrder
-    .map((category) => ({
+  const topByScore = (items: typeof allItems) =>
+    [...items].sort((a, b) => b.score - a.score).slice(0, TOP_N_PER_CATEGORY);
+
+  // "Near Columbia" goes first and spans every activity type, so a suggestion
+  // can appear both here and in its own category.
+  const sections = [
+    {
+      category: NEAR_COLUMBIA_LABEL,
+      items: topByScore(allItems.filter((item) => isNearColumbia(item.neighborhood))),
+    },
+    ...categoryOrder.map((category) => ({
       category,
-      items: (byCategory.get(category) ?? [])
-        .sort((a, b) => b.score - a.score)
-        .slice(0, TOP_N_PER_CATEGORY),
-    }))
-    .filter((section) => section.items.length > 0);
+      items: topByScore(byCategory.get(category) ?? []),
+    })),
+  ].filter((section) => section.items.length > 0);
 
   return (
     <main className="flex flex-1 flex-col">

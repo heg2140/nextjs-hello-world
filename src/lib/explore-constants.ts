@@ -83,7 +83,18 @@ export const SEARCHABLE_NEIGHBORHOODS = NEIGHBORHOODS.filter(
   (n) => !n.startsWith("Elsewhere")
 );
 
+// Columbia's campus is in Morningside Heights; these are the neighborhoods a
+// short walk or one or two subway stops away. Matched loosely so older,
+// free-text neighborhood names still count.
+export const NEAR_COLUMBIA_LABEL = "Top picks near Columbia";
+const NEAR_COLUMBIA_PATTERN = /morningside|upper west side|\buws\b|manhattanville|(?<!east )harlem/i;
+
+export function isNearColumbia(neighborhood: string | null | undefined) {
+  return NEAR_COLUMBIA_PATTERN.test(neighborhood ?? "");
+}
+
 export const ACTIVITY_ICONS: Record<string, string> = {
+  [NEAR_COLUMBIA_LABEL]: "🎓",
   "Outdoors / nature": "🌳",
   "Art / museums": "🎨",
   "Music / performance": "🎵",
