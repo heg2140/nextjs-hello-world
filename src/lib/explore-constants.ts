@@ -82,3 +82,16 @@ export const NEIGHBORHOODS = [
 export const SEARCHABLE_NEIGHBORHOODS = NEIGHBORHOODS.filter(
   (n) => !n.startsWith("Elsewhere")
 );
+
+export const ACTIVITY_ICONS: Record<string, string> = {
+  "Outdoors / nature": "🌳",
+  "Art / museums": "🎨",
+  "Music / performance": "🎵",
+  "Food / markets": "🥟",
+  "History / walking tour": "🏛️",
+  "Views / photo spots": "📸",
+};
+
+export function activityIcon(activityType: string | null | undefined) {
+  return (activityType && ACTIVITY_ICONS[activityType]) || "📍";
+}

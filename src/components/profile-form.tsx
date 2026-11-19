@@ -93,7 +93,7 @@ export function ProfileForm({
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full">
       {isIncomplete && (
         <div className="mb-6 rounded-lg bg-amber-50 px-4 py-3 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-300">
           Welcome! Please add your first and last name to finish setting up

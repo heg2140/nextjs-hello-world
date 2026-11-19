@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ExploreForm } from "@/components/explore-form";
 import { SuggestionFeed } from "@/components/suggestion-feed";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +41,7 @@ export default async function NewSearchPage({
     description: string;
     neighborhood: string;
     transit_directions: string;
+    activity_type: string | null;
     created_at: string;
     score: number;
     myVote: number;
@@ -51,7 +52,7 @@ export default async function NewSearchPage({
       supabase
         .from("suggestions")
         .select(
-          "id, title, description, neighborhood, transit_directions, created_at"
+          "id, title, description, neighborhood, transit_directions, activity_type, created_at"
         )
         .eq("generation_id", latestGeneration.id)
         .order("created_at", { ascending: true }),
@@ -92,33 +93,31 @@ export default async function NewSearchPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-zinc-950">
-      <div className="w-full max-w-5xl">
-        <Link
-          href="/explore"
-          className="text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-        >
-          ← Back to Explore
-        </Link>
+    <main className="flex flex-1 flex-col">
+      <PageHeader
+        back={{ href: "/explore", label: "Back to Explore" }}
+        title="Find something free to do"
+        description="Tell it where you are, and it'll generate a few free, transit-reachable ideas."
+      />
 
-        <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-          Find something free to do
-        </h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-          Tell it where you are, and it&apos;ll generate a few free, transit-reachable
-          ideas.
-        </p>
-
+      <div className="mx-auto w-full max-w-7xl px-6 pb-20">
         <ExploreForm />
 
-        <h2 className="mt-12 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-          Results ({latestItems.length})
-        </h2>
+        <div className="mt-14 flex items-baseline justify-between border-b border-zinc-200 pb-3 dark:border-zinc-800">
+          <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+            Results ({latestItems.length})
+          </h2>
+          {latestItems.length > 0 && (
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Vote on the ones worth it. The best rise to Explore.
+            </p>
+          )}
+        </div>
         <SuggestionFeed
           items={latestItems}
           emptyMessage="Generate suggestions above to see results here."
         />
       </div>
-    </div>
+    </main>
   );
 }

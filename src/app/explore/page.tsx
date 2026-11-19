@@ -2,7 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SuggestionFeed } from "@/components/suggestion-feed";
-import { ACTIVITY_TYPES } from "@/lib/explore-constants";
+import { PageHeader } from "@/components/page-header";
+import { ACTIVITY_TYPES, activityIcon } from "@/lib/explore-constants";
 
 export const dynamic = "force-dynamic";
 
@@ -75,51 +76,73 @@ export default async function ExplorePage() {
     .filter((section) => section.items.length > 0);
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-zinc-50 px-6 py-20 font-sans dark:bg-zinc-950">
-      <div className="w-full max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Free NYC
-            </h1>
-            <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-              The community&apos;s top-voted free things to do, by category.
-            </p>
-          </div>
+    <main className="flex flex-1 flex-col">
+      <PageHeader
+        eyebrow="Explore"
+        title="Top-voted free things to do"
+        description={`The community's ${TOP_N_PER_CATEGORY} favorite picks in each category, ranked by votes.`}
+        actions={
           <Link
             href="/explore/new"
-            className="shrink-0 rounded-full bg-zinc-800 px-8 py-4 text-base font-semibold text-white shadow-md transition-all hover:scale-[1.03] hover:bg-zinc-700 hover:shadow-lg dark:bg-zinc-200 dark:text-zinc-900 dark:hover:bg-zinc-100"
+            className="inline-block rounded-full bg-zinc-900 px-7 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
           >
             Find something to do
           </Link>
-        </div>
+        }
+      />
+
+      <div className="mx-auto w-full max-w-7xl px-6 pb-20">
+        {sections.length > 0 && (
+          <nav className="flex flex-wrap gap-2 pt-8">
+            {sections.map((section) => (
+              <a
+                key={section.category}
+                href={`#${encodeURIComponent(section.category)}`}
+                className="rounded-full border border-zinc-200 bg-white px-3.5 py-1.5 text-sm font-medium text-zinc-700 transition-colors hover:border-zinc-400 hover:text-zinc-900 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-zinc-600 dark:hover:text-zinc-50"
+              >
+                {activityIcon(section.category)} {section.category}
+              </a>
+            ))}
+          </nav>
+        )}
 
         {suggestionsError && (
-          <p className="mt-8 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <p className="mt-10 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
             Failed to load suggestions: {suggestionsError.message}
           </p>
         )}
 
         {!suggestionsError && sections.length === 0 && (
-          <p className="mt-12 text-zinc-500 dark:text-zinc-400">
-            Nothing here yet —{" "}
-            <Link href="/explore/new" className="underline">
-              generate the first suggestions
-            </Link>
-            .
-          </p>
+          <div className="mt-12 rounded-2xl border border-dashed border-zinc-300 bg-white p-12 text-center dark:border-zinc-700 dark:bg-zinc-900">
+            <p className="text-lg font-medium text-zinc-900 dark:text-zinc-50">Nothing here yet</p>
+            <p className="mt-2 text-zinc-500 dark:text-zinc-400">
+              <Link href="/explore/new" className="underline">
+                Generate the first suggestions
+              </Link>{" "}
+              and they&apos;ll show up here.
+            </p>
+          </div>
         )}
 
         {!suggestionsError &&
           sections.map((section) => (
-            <div key={section.category} className="mt-12">
-              <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                {section.category}
-              </h2>
-              <SuggestionFeed items={section.items} />
-            </div>
+            <section
+              key={section.category}
+              id={encodeURIComponent(section.category)}
+              className="mt-12 scroll-mt-24"
+            >
+              <div className="flex items-center gap-3 border-b border-zinc-200 pb-3 dark:border-zinc-800">
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl shadow-sm ring-1 ring-zinc-200 dark:bg-zinc-900 dark:ring-zinc-800">
+                  {activityIcon(section.category)}
+                </span>
+                <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+                  {section.category}
+                </h2>
+              </div>
+              <SuggestionFeed items={section.items} showRank />
+            </section>
           ))}
       </div>
-    </div>
+    </main>
   );
 }
