@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { HeaderNav } from "@/components/header-nav";
+import { HeaderNav, HeaderSignIn } from "@/components/header-nav";
 
 export async function SiteHeader() {
   const supabase = await createClient();
@@ -48,12 +48,7 @@ export async function SiteHeader() {
               />
             </Link>
           ) : (
-            <Link
-              href="/login"
-              className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
-            >
-              Sign in
-            </Link>
+            <HeaderSignIn />
           )}
         </div>
       </div>
