@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ExploreForm } from "@/components/explore-form";
 import { SuggestionFeed } from "@/components/suggestion-feed";
 import { PageHeader } from "@/components/page-header";
+import { loadSavedIds } from "@/lib/saved";
 
 export const dynamic = "force-dynamic";
 
@@ -45,10 +46,11 @@ export default async function NewSearchPage({
     created_at: string;
     score: number;
     myVote: number;
+    isSaved: boolean;
   }> = [];
 
   if (latestGeneration) {
-    const [{ data: suggestions }, { data: votes }] = await Promise.all([
+    const [{ data: suggestions }, { data: votes }, savedIds] = await Promise.all([
       supabase
         .from("suggestions")
         .select(
@@ -60,6 +62,7 @@ export default async function NewSearchPage({
         .from("votes")
         .select("suggestion_id, user_id, value")
         .eq("user_id", user.id),
+      loadSavedIds(supabase, user.id),
     ]);
 
     const myVoteBySuggestion = new Map<number, number>();
@@ -89,6 +92,7 @@ export default async function NewSearchPage({
       ...s,
       score: scoreBySuggestion.get(s.id) ?? 0,
       myVote: myVoteBySuggestion.get(s.id) ?? 0,
+      isSaved: savedIds.has(s.id),
     }));
   }
 

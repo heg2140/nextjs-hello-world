@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { SuggestionFeed } from "@/components/suggestion-feed";
 import { PageHeader } from "@/components/page-header";
+import { loadSavedIds } from "@/lib/saved";
 import {
   ACTIVITY_TYPES,
   NEAR_COLUMBIA_LABEL,
@@ -24,7 +25,7 @@ export default async function ExplorePage() {
     redirect("/login");
   }
 
-  const [{ data: suggestions, error: suggestionsError }, { data: votes }] =
+  const [{ data: suggestions, error: suggestionsError }, { data: votes }, savedIds] =
     await Promise.all([
       supabase
         .from("suggestions")
@@ -33,6 +34,7 @@ export default async function ExplorePage() {
         )
         .order("created_at", { ascending: true }),
       supabase.from("votes").select("suggestion_id, user_id, value"),
+      loadSavedIds(supabase, user.id),
     ]);
 
   const votesBySuggestion = new Map<number, { score: number; myVote: number }>();
@@ -52,6 +54,7 @@ export default async function ExplorePage() {
     ...s,
     score: votesBySuggestion.get(s.id)?.score ?? 0,
     myVote: votesBySuggestion.get(s.id)?.myVote ?? 0,
+    isSaved: savedIds.has(s.id),
   }));
 
   const byCategory = new Map<string, typeof allItems>();

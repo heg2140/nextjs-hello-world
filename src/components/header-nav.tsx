@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 
 const LINKS = [
   { href: "/explore", label: "Explore" },
-  { href: "/explore/new", label: "Find something" },
+  // "Find something" is shortened to "Find" on phones so the header fits.
+  { href: "/explore/new", label: "Find", extra: " something" },
+  { href: "/saved", label: "Saved" },
 ];
 
 export function HeaderNav() {
@@ -13,7 +15,7 @@ export function HeaderNav() {
 
   return (
     <nav className="flex items-center gap-1">
-      {LINKS.map(({ href, label }) => {
+      {LINKS.map(({ href, label, extra }) => {
         const active = pathname === href;
         return (
           <Link
@@ -21,11 +23,12 @@ export function HeaderNav() {
             href={href}
             className={
               active
-                ? "rounded-full bg-zinc-100 px-3 py-1.5 text-sm font-medium text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
-                : "rounded-full px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
+                ? "rounded-full bg-zinc-100 px-2.5 py-1.5 sm:px-3 text-sm font-medium text-zinc-900 dark:bg-zinc-800 dark:text-zinc-50"
+                : "rounded-full px-2.5 py-1.5 sm:px-3 text-sm font-medium text-zinc-600 transition-colors hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
             }
           >
             {label}
+            {extra && <span className="hidden sm:inline">{extra}</span>}
           </Link>
         );
       })}

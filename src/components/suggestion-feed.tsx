@@ -7,6 +7,7 @@ import { activityIcon } from "@/lib/explore-constants";
 import { withoutAlternatives } from "@/lib/transit";
 import { SuggestionDetail } from "@/components/suggestion-detail";
 import { VoteControl } from "@/components/vote-control";
+import { SaveButton } from "@/components/save-button";
 
 // Cut text at a word boundary so the card can show a "Read more" link.
 function preview(text: string, maxLength: number) {
@@ -33,6 +34,7 @@ type FeedItem = {
   created_at: string;
   score: number;
   myVote: number;
+  isSaved?: boolean;
 };
 
 export function SuggestionFeed({
@@ -78,6 +80,31 @@ export function SuggestionFeed({
       );
     }
 
+    router.refresh();
+  };
+
+  const handleSave = async (suggestionId: number) => {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const item = items.find((i) => i.id === suggestionId);
+    const { error } = item?.isSaved
+      ? await supabase
+          .from("saved_suggestions")
+          .delete()
+          .eq("suggestion_id", suggestionId)
+          .eq("user_id", user.id)
+      : await supabase
+          .from("saved_suggestions")
+          .insert({ suggestion_id: suggestionId, user_id: user.id });
+
+    if (error) {
+      alert(`Couldn't update your saved list: ${error.message}`);
+      return;
+    }
     router.refresh();
   };
 
@@ -160,9 +187,14 @@ export function SuggestionFeed({
                 </span>
               </div>
 
-              <p className="mt-4 text-sm font-medium text-zinc-500 transition-colors group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-zinc-100">
-                View details →
-              </p>
+              <div className="mt-4 flex items-center justify-between">
+                <p className="text-sm font-medium text-zinc-500 transition-colors group-hover:text-zinc-900 dark:text-zinc-400 dark:group-hover:text-zinc-100">
+                  View details →
+                </p>
+                <div className="relative z-10">
+                  <SaveButton saved={item.isSaved ?? false} onToggle={() => handleSave(item.id)} />
+                </div>
+              </div>
             </li>
           );
         })}
@@ -173,6 +205,7 @@ export function SuggestionFeed({
           item={openItem}
           onClose={() => setOpenId(null)}
           onVote={(value) => handleVote(openItem.id, value)}
+          onToggleSave={() => handleSave(openItem.id)}
         />
       )}
     </>

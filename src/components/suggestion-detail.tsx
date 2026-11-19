@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { activityIcon } from "@/lib/explore-constants";
 import { parseTransit, STEP_ICONS } from "@/lib/transit";
 import { VoteControl } from "@/components/vote-control";
+import { SaveButton } from "@/components/save-button";
 
 export type DetailItem = {
   id: number;
@@ -14,6 +15,7 @@ export type DetailItem = {
   activity_type?: string | null;
   score: number;
   myVote: number;
+  isSaved?: boolean;
 };
 
 // Popup with everything about one suggestion. Uses the native <dialog>
@@ -22,10 +24,12 @@ export function SuggestionDetail({
   item,
   onClose,
   onVote,
+  onToggleSave,
 }: {
   item: DetailItem;
   onClose: () => void;
   onVote: (value: 1 | -1) => void;
+  onToggleSave: () => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -94,6 +98,9 @@ export function SuggestionDetail({
               <span className="rounded-full bg-zinc-900 px-3 py-1 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
                 Free
               </span>
+            </div>
+            <div className="mt-5">
+              <SaveButton saved={item.isSaved ?? false} onToggle={onToggleSave} size="lg" />
             </div>
           </div>
         </div>
