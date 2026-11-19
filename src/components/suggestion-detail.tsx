@@ -95,9 +95,7 @@ export function SuggestionDetail({
                   {item.activity_type}
                 </span>
               )}
-            </div>
-            <div className="mt-5">
-              <SaveButton saved={item.isSaved ?? false} onToggle={onToggleSave} size="lg" />
+              <SaveButton saved={item.isSaved ?? false} onToggle={onToggleSave} size="tag" />
             </div>
           </div>
         </div>
