@@ -41,29 +41,34 @@ export default async function Home() {
               Free NYC
             </h1>
             <p className="mt-6 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              AI-curated, student-voted free things to do around the city — just
-              tell it where you are and how far you&apos;ll go.
+              AI-curated, student-voted free things to do around the city.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
-              <Link
-                href={user ? "/explore/new" : "/login"}
-                className="rounded-full bg-zinc-900 px-7 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
-              >
-                Find something to do
-              </Link>
-              <Link
-                href="/explore"
-                className="rounded-full border border-zinc-300 bg-white px-7 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
-              >
-                Explore top picks
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/explore/new"
+                    className="rounded-full bg-zinc-900 px-7 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+                  >
+                    Find something to do
+                  </Link>
+                  <Link
+                    href="/explore"
+                    className="rounded-full border border-zinc-300 bg-white px-7 py-3.5 text-base font-semibold text-zinc-900 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:hover:bg-zinc-800"
+                  >
+                    Explore top picks
+                  </Link>
+                </>
+              ) : (
+                <Link
+                  href="/login"
+                  className="rounded-full bg-zinc-900 px-7 py-3.5 text-base font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-white"
+                >
+                  Sign in
+                </Link>
+              )}
             </div>
-            {!user && (
-              <p className="mt-4 text-sm text-zinc-500 dark:text-zinc-400">
-                Sign in with Google to get started. It&apos;s free.
-              </p>
-            )}
           </div>
 
           <div aria-hidden className="relative hidden lg:block">
