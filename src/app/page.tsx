@@ -26,21 +26,6 @@ const PREVIEW = [
   },
 ];
 
-const STEPS = [
-  {
-    title: "Tell it where you are",
-    body: "Pick a starting point, an activity type, a time of day and how far you'll travel.",
-  },
-  {
-    title: "Get free ideas instantly",
-    body: "The AI suggests specific free things to do, each with a transit route to get there.",
-  },
-  {
-    title: "Vote on the best ones",
-    body: "Upvote what's worth it. The top picks rise to the Explore page for everyone.",
-  },
-];
-
 export default async function Home() {
   const supabase = await createClient();
   const {
@@ -49,21 +34,15 @@ export default async function Home() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <section className="bg-dots border-b border-zinc-200 dark:border-zinc-800">
+      <section className="bg-dots flex flex-1 items-center">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-6 py-16 sm:py-24 lg:grid-cols-[1.1fr_1fr]">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-zinc-900 dark:bg-zinc-100" />
-              For students exploring New York
-            </p>
-            <h1 className="mt-6 text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl lg:text-7xl dark:text-zinc-50">
-              Free things to do,{" "}
-              <br className="hidden sm:block" />
-              <span className="text-zinc-400 dark:text-zinc-500">one subway ride away.</span>
+            <h1 className="text-5xl font-semibold tracking-tight text-zinc-900 sm:text-6xl lg:text-7xl dark:text-zinc-50">
+              Free NYC
             </h1>
             <p className="mt-6 max-w-xl text-lg text-zinc-600 dark:text-zinc-400">
-              AI-curated, student-voted ideas around the city. Just tell it where
-              you are and how far you&apos;ll go. The only cost is the fare.
+              AI-curated, student-voted free things to do around the city — just
+              tell it where you are and how far you&apos;ll go.
             </p>
 
             <div className="mt-10 flex flex-wrap items-center gap-3">
@@ -115,27 +94,6 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-7xl px-6 py-16">
-        <h2 className="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-          How it works
-        </h2>
-        <ol className="mt-6 grid gap-4 md:grid-cols-3">
-          {STEPS.map((step, i) => (
-            <li
-              key={step.title}
-              className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white dark:bg-zinc-100 dark:text-zinc-900">
-                {i + 1}
-              </span>
-              <h3 className="mt-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-                {step.title}
-              </h3>
-              <p className="mt-2 text-zinc-600 dark:text-zinc-400">{step.body}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
     </main>
   );
 }
