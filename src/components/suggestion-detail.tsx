@@ -95,9 +95,6 @@ export function SuggestionDetail({
                   {item.activity_type}
                 </span>
               )}
-              <span className="rounded-full bg-zinc-900 px-3 py-1 text-sm font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">
-                Free
-              </span>
             </div>
             <div className="mt-5">
               <SaveButton saved={item.isSaved ?? false} onToggle={onToggleSave} size="lg" />
