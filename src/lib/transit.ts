@@ -40,8 +40,26 @@ function capitalize(s: string) {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-export function parseTransit(directions: string): { steps: TransitStep[]; note: string | null } {
+// Older suggestions sometimes offer a second route ("Alternatively, take the
+// M4 bus..."). Only the first route is shown.
+const ALTERNATIVE_PATTERN =
+  /^(alternatively|alternative(ly)?( route)?:|another (option|route|way)|or,? you (can|could)|you (can|could) also|if you prefer|or take|or ride|or walk|or catch|option 2|\(or\b)/i;
+
+export function withoutAlternatives(directions: string) {
   const text = (directions ?? "").replace(/\s+/g, " ").trim();
+  return text
+    // Parenthetical alternatives: "...to 14 St (or the 2/3 to 14 St)".
+    .replace(/\s*\((?:or|alternatively)\b[^)]*\)/gi, "")
+    // Clause-level alternatives: "...to 14 St, or take the bus to ...".
+    .replace(/[,;]\s*(?:or\s+(?:take|ride|catch|walk|hop on)|alternatively)\b[^.;]*(?=[.;]|$)/gi, "")
+    .split(/(?<=[.!?])\s+(?=[A-Z(])/)
+    .filter((sentence) => !ALTERNATIVE_PATTERN.test(sentence.trim()))
+    .join(" ")
+    .trim();
+}
+
+export function parseTransit(directions: string): { steps: TransitStep[]; note: string | null } {
+  const text = withoutAlternatives(directions);
   if (!text) return { steps: [], note: null };
 
   // Sentences first, so the disclaimer can be separated out. Don't split on

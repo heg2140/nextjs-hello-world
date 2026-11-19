@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { activityIcon } from "@/lib/explore-constants";
+import { withoutAlternatives } from "@/lib/transit";
 import { SuggestionDetail } from "@/components/suggestion-detail";
 import { VoteControl } from "@/components/vote-control";
 
@@ -93,7 +94,7 @@ export function SuggestionFeed({
       <ul className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         {items.map((item, index) => {
           const description = preview(item.description, DESCRIPTION_PREVIEW);
-          const transit = preview(item.transit_directions, TRANSIT_PREVIEW);
+          const transit = preview(withoutAlternatives(item.transit_directions), TRANSIT_PREVIEW);
           const readMore = (
             <button
               type="button"

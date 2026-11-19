@@ -92,7 +92,7 @@ Maximum one-way travel time: ${input.maxTravelMinutes} minutes${
       : ""
   }
 
-Suggest exactly ${SUGGESTION_COUNT} distinct, real, specific free things to do in NYC that fit these constraints. For each, include a short best-guess public transit route from the starting point, and explicitly note in that field that it's an AI estimate the user should double check before heading out.`;
+Suggest exactly ${SUGGESTION_COUNT} distinct, real, specific free things to do in NYC that fit these constraints. For each, include a short best-guess public transit route from the starting point: exactly one route, with no alternative routes or "alternatively" options. Explicitly note in that field that it's an AI estimate the user should double check before heading out.`;
 }
 
 function isValidSuggestion(value: unknown): value is SuggestionShape {
